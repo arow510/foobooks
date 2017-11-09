@@ -1,39 +1,109 @@
 <?php
-
-
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Debugbar;
 use cebe\markdown\MarkdownExtra;
 use App\Rules\AlphaAndSpaces;
+use App\Book;
 class PracticeController extends Controller
 {
     /**
+    *
+    */
+    public function practice11()
+    {
+        $book = Book::find(11);
+        if ($book) {
+            dump('Did not delete book 11, did not find it.');
+        } else {
+            $books->delete();
+            dump('Deleted book #11');
+        }
+    }
+    /**
+    *
+    */
+    public function practice10()
+    {
+        # First get a book to update
+        $book = Book::where('author', 'LIKE', '%Scott%')->first();
+        if (!$book) {
+            dump("Book not found, can't update.");
+        } else {
+            # Change some properties
+            $book->title = 'The Really Great Gatsby';
+            $book->published = '2025';
+            # Save the changes
+            $book->save();
+            dump('Update complete; check the database to confirm the update worked.');
+        }
+    }
+    /**
+    * Example of querying for books with constraints using an Eloquent model
+    */
+    public function practice8()
+    {
+        #$book = new Book();
+        $books = Book::where('title', 'LIKE', '%Harry Potter%')
+            ->orWhere('published', '>=', 1880)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        dump($books->toArray());
+    }
+    /**
+    * Example of querying for books using an Eloquent model
+    */
+    public function practice7()
+    {
+        $book = new Book();
+        $books = $book->all();
+        dump($books->toArray());
+    }
+    /**
+    * Example of adding a new book using an Eloquent model
+    */
+    public function practice6()
+    {
+        # Instantiate a new Book Model object
+        $book = new Book();
+        # Set the parameters
+        # Note how each parameter corresponds to a field in the table
+        $book->title = 'Harry Potter and the Sorcerer\'s Stone';
+        $book->author = 'J.K. Rowling';
+        $book->published = 1997;
+        $book->cover = 'http://prodimage.images-bn.com/pimages/9780590353427_p0_v1_s484x700.jpg';
+        $book->purchase_link = 'http://www.barnesandnoble.com/w/harry-potter-and-the-sorcerers-stone-j-k-rowling/1100036321?ean=9780590353427';
+        # Invoke the Eloquent `save` method to generate a new row in the
+        # `books` table, with the above data
+        $book->save();
+        dump($book->toArray());
+    }
+    /**
     * Demonstration of a custom validation rule
     */
-    public function practice6(Request $request)
+    public function practice5(Request $request)
     {
         $name = $request->input('name', null);
         $this->validate($request, [
-            #'name' => [new AlphaAndSpaces]
-            'name' => 'regex:/^[\pL\s\-]+$/u'
+            'name' => [new AlphaAndSpaces]
+            #'name' => 'regex:/^[\pL\s\-]+$/u'
         ]);
         return view('practice.6')->with([
             'name' => $name,
         ]);
     }
     /**
-    *
+    * Example using an external package
     */
-    public function practice5()
+    public function practice4()
     {
         $parser = new MarkdownExtra();
         echo $parser->parse('# Hello World');
     }
     /**
-    *
+    * Examples writing to the Debugbar
     */
-    public function practice4()
+    public function practice3()
     {
         Debugbar::info($_GET);
         Debugbar::info(['a' => 1, 'b' => 2, 'c' => 3]);
@@ -43,26 +113,19 @@ class PracticeController extends Controller
         return 'Practice 4';
     }
     /**
-    *
+    * Purposefully create an error to view it in the error logs
     */
-    public function practice3()
+    public function practice2()
     {
         return view('abc');
     }
     /**
-    *
-    */
-    public function practice2()
-    {
-        $email = config('mail');
-        dump($email);
-    }
-    /**
-    *
+    * Viewing config info
     */
     public function practice1()
     {
-        dump('This is the first example.');
+        $email = config('mail');
+        dump($email);
     }
     /**
     * ANY (GET/POST/PUT/DELETE)
